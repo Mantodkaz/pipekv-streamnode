@@ -215,7 +215,7 @@ This project explores real-time video delivery via Pipe KV, showing how PoP node
 ## Author
 - Community Pipe Network
 
-Unofficial community tool - not maintained by core team. Use with care.
+This is a side project from the community - not officially maintained. Try it out, but know what you're doing.
 
 ## Reference
 https://x.com/DavidRhodus/status/1929771104593498209
