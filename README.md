@@ -209,7 +209,7 @@ This will:
 ---
 
 ## Why This Project?
-was created to explore real-time video delivery using Pipe KV. This artifact shows how PoPs can function as uploaders and egress routers.
+This project explores real-time video delivery via Pipe KV, showing how PoP nodes can act both as uploaders and content routers.
 
 
 ## Author
