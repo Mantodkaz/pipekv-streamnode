@@ -16,13 +16,13 @@ SEGMENTS_DIR="./segments"
 M3U8_DIR="./video"
 SERVICE_KEY="$X_SERVICE_KEY"
 
-# detect public IP and set HOST
+# get IP & set host
 IP=$(curl -s https://api.ipify.org)
 if [[ ! "$IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   echo "[!] Failed to detect public IP, fallback to 127.0.0.1"
   IP="127.0.0.1"
 fi
-HOST="https://$IP:6969"
+HOST="https://$IP"
 
 
 command -v jq >/dev/null 2>&1 || {
@@ -112,8 +112,9 @@ fi
 echo "[✓] Uploaded successfully."
 echo "→ M3U8 URL: https://<proxy_server:6969>/m3u8/${BASENAME_ID}.m3u8"
 
-# Update index
+# === Update index
 echo "[*] Updating m3u8_index_cache.json..."
+
 RAW_LIST="./video/m3u8_index_raw.txt"
 CACHE_FILE="./video/m3u8_index_cache.json"
 
@@ -122,7 +123,7 @@ jq -R -s -c 'split("\n") | map(select(. != ""))' "$RAW_LIST" > "$CACHE_FILE"
 
 echo "[✓] Index updated: $CACHE_FILE"
 
-# Cleanup
+# === Cleanup
 echo "[*] Cleaning up..."
 rm -f "$M3U8_PATH"
 rm -f "$SEGMENTS_DIR/${BASENAME_ID}_part_"*.ts
