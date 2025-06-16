@@ -201,7 +201,7 @@ This will:
 
 ### Workflow
 
-1. User uploads `video.mp4` via browser
+1. User downloads video.mp4 to the PoP node server (can use scp, wget, curl, or any preferred method)
 2. PoP server receives file → splits with ffmpeg → uploads segments to KV
 3. `.m3u8` generated and returned to browser
 4. HLS.js streams content from Pipe KV via fastapi 
