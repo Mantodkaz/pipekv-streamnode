@@ -1,4 +1,4 @@
-# pipekv streamnode
+# pipeKV stream 
 
 A minimal pipeline for segmenting, uploading, and streaming video content using Pipe Network’s KV storage — fully operated from a PoP node.
 
