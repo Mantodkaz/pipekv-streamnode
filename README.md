@@ -11,16 +11,16 @@ The system is split into:
 ## ⚙️ Overview
 
 ```
-[Operator PoP Node]
+[Your PoP Node Server]
      |
      | (1) Upload .mp4 to server
      v
   [ts.sh script]
      |
      | (2) ffmpeg → segment into .ts + .m3u8
-     | (3) Upload to Pipe KV (use X-Service-Key)
+     | (3) Upload to Pipe KV (need X-Service-Key)
      v
-[Pipe Network KV Storage]
+[PoP KV Storage]
      ^
      | (4) Fetch via FastAPI proxy (/m3u8 + /ts)
      v
@@ -46,11 +46,12 @@ pipekv-streamnode/
 ├── .env            # Environment variables (X_SERVICE_KEY, PIPE_KV_URL, ALLOWED_REF)
 ├── ts.sh           # Bash script: ffmpeg segmenting + upload to Pipe KV
 ├── pipe_api.py     # FastAPI server: proxy for /m3u8 and /ts endpoints 
-├── example.mp4     # your video file
+├── video.mp4     # your video file
 ```
 ### Web Hosting (Frontend)
 ```
 /directory_root/
+├── .htaccess
 ├── index.php              # Entry point UI for stream list
 ├── player.php             # HLS.js player for a selected .m3u8
 ├── m3u8_index_cache.json  # Playlist index (copy from VPS ./video/ after running ts.sh)
@@ -75,7 +76,6 @@ pipekv-streamnode/
 
   → The upload destination defaults to `https://127.0.0.1`, assuming your FastAPI proxy is running locally. You can adjust this via the `HOST` variable in the script if needed.
 
----
 
 * `pipe_api.py`
   A FastAPI server that acts as a secure proxy for:
@@ -84,17 +84,18 @@ pipekv-streamnode/
   * `/ts/{filename}`   → video segments
 
   It includes:
-
   * Origin/Referer validation
   * Protection against path traversal
   * CORS restrictions to only allow your frontend domain
 
   → This script also uses the `.env` file. Set it up like this:
 
-  ```
-  X_SERVICE_KEY=your-key-from-pop_state.json
-  PIPE_KV_URL=https://your-pop-node.ip
-  ALLOWED_REF=https://your-stream-site.example.com
+```
+# Required PoP Node Service Key (used to access Pipe KV)
+X_SERVICE_KEY=
+
+# Allowed domain for CORS (frontend/player domain)
+ALLOWED_REF=https://yourfrontend.domain
   ```
 
 ---
@@ -123,9 +124,9 @@ $m3u8_url = "http://your-node-ip-or-domain:6969/m3u8/" . rawurlencode($filename)
 ---
 
 
-## Usage
+## USAGE
 
-###  Setup PoP Node (VPS)
+###  Setup in your PoP Node server (VPS)
 
 #### 1. Install dependencies
 
@@ -145,6 +146,7 @@ pip install fastapi httpx uvicorn python-dotenv uvloop httptools
 
 ---
 
+
 #### 3. Launch FastAPI proxy using screen
 
 ```bash;
@@ -156,8 +158,27 @@ uvicorn pipe_api:app \
   --loop uvloop \
   --http httptools
 ```
+
 > Use `Ctrl+A, D` to detach the screen session.
 > To reattach later, use `screen -r pipeapi`.
+
+---
+
+⚠️ **If your frontend uses HTTPS (SSL), you must launch Uvicorn with SSL certs to avoid browser blocking due to mixed content:**
+
+```bash
+uvicorn pipe_api:app \
+  --host 0.0.0.0 \
+  --port 6969 \
+  --ssl-keyfile /etc/letsencrypt/live/yourdomain.com/privkey.pem \
+  --ssl-certfile /etc/letsencrypt/live/yourdomain.com/fullchain.pem \
+  --workers 2 \
+  --loop uvloop \
+  --http httptools
+```
+
+> Replace `yourdomain.com` with your actual domain name.
+> Required if your HLS player is loaded over `https://`.
 
 ---
 
@@ -178,7 +199,7 @@ This will:
 
 ---
 
-### 3. Workflow
+### Workflow
 
 1. User uploads `video.mp4` via browser
 2. PoP server receives file → splits with ffmpeg → uploads segments to KV
