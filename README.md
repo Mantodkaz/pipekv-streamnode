@@ -43,7 +43,7 @@ The system is split into:
 
 ```
 pipekv-streamnode/
-├── .env            # Environment variables (X_SERVICE_KEY, PIPE_KV_URL, ALLOWED_REF)
+├── .env            # Environment variables (X_SERVICE_KEY, ALLOWED_REF)
 ├── ts.sh           # Bash script: ffmpeg segmenting + upload to Pipe KV
 ├── pipe_api.py     # FastAPI server: proxy for /m3u8 and /ts endpoints 
 ├── video.mp4     # your video file
