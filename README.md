@@ -204,7 +204,7 @@ This will:
 1. User uploads `video.mp4` via browser
 2. PoP server receives file → splits with ffmpeg → uploads segments to KV
 3. `.m3u8` generated and returned to browser
-4. HLS.js streams content from Pipe KV via `/ts?f=...` proxy
+4. HLS.js streams content from Pipe KV via fastapi 
 
 ---
 
